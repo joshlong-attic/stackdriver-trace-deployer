@@ -81,6 +81,7 @@ public class ManifestService {
 			builder.memory(1024);
 		});
 		optionalIfExists(lhm, "disk", Integer.class).ifPresent(builder::disk);
+		optionalIfExists(lhm, "command", String.class).ifPresent(builder::command);
 		optionalIfExists(lhm, "domains", String.class).ifPresent(builder::domain);
 		optionalIfExists(lhm, "instances", Integer.class).ifPresent(
 				builder::instances);

@@ -51,44 +51,41 @@ class DeployerCommandLineRunner implements CommandLineRunner {
 	@Override
 	public void run(String... strings) throws Exception {
 		String jsonPath = "/Users/jlong/Desktop/gcp.json";
-		String gcpServiceBrokerApplication = deployGcpServiceBrokerApplication(jsonPath);
-		convertApplicationIntoServiceBroker(gcpServiceBrokerApplication);
-		log.info("gcpServiceBrokerApplication = " + gcpServiceBrokerApplication);
+		String gcpServiceBrokerApplicationURL = deployGcpServiceBrokerApplication(jsonPath);
+		convertApplicationIntoServiceBroker(gcpServiceBrokerApplicationURL);
+		log.info("service broker application URL = " + gcpServiceBrokerApplicationURL);
 /*
 		String stackdriverProxyApplication = deployStackdriverProxyApplication();
 		log.info("stackdriverProxyApplication = " + stackdriverProxyApplication);*/
 	}
 
 	private String deployGcpServiceBrokerApplication(String jsonPath) throws Exception {
-
-		// TODO this wont always be on our desktop!
-
 		String inputUploadDirectory = "/gcp-service-broker-assets/";
 		String binaryName = "gcp-service-broker";
 		String manifestName = "manifest.yml";
-		Path uploadPath = stageTempUploadDir(inputUploadDirectory, binaryName, manifestName);
+		String procfile = "Procfile";
+		Path uploadPath = stageTempUploadDir(inputUploadDirectory, binaryName, manifestName, procfile);
 		String planName = "512mb";
 		String serviceInstanceName = "gcp-service-broker-db";
 		String serviceName = "p-mysql";
 
-//		this.provisionServiceInstance(planName, serviceInstanceName, serviceName);
+		this.provisionServiceInstance(planName, serviceInstanceName, serviceName);
 		ApplicationManifest manifest = this.manifestService.applicationManifestFrom(new File(uploadPath.toFile(), "manifest.yml").toPath());
-		//this.pushApplicationUsingManifest(uploadPath, manifest, false);
-		ApplicationDetail applicationDetail = this.cloudFoundryOperations.applications().get(GetApplicationRequest.builder().name(manifest.getName()).build()).block();
+		this.pushApplicationUsingManifest(uploadPath, manifest, false);
 
 		ApplicationEnvironments environments = this.cloudFoundryOperations.applications().getEnvironments(GetApplicationEnvironmentsRequest.builder().name(manifest.getName()).build()).block();
 		Map<String, String> env = readDatabaseEnvironment(environments);
 		env.put("ROOT_SERVICE_ACCOUNT_JSON", Files.readAllLines(Paths.get(jsonPath))
 				.stream().collect(Collectors.joining(System.lineSeparator())));
-
 		env.forEach((k, v) -> cloudFoundryOperations.applications().setEnvironmentVariable(SetEnvironmentVariableApplicationRequest
 				.builder()
 				.name(manifest.getName())
 				.variableName(k)
 				.variableValue(v)
 				.build()).block());
-
-		return null;
+		this.cloudFoundryOperations.applications().start(StartApplicationRequest.builder().name(manifest.getName()).build()).block();
+		ApplicationDetail applicationDetail = this.cloudFoundryOperations.applications().get(GetApplicationRequest.builder().name(manifest.getName()).build()).block();
+		return applicationDetail.getUrls().get(0);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -121,7 +118,7 @@ class DeployerCommandLineRunner implements CommandLineRunner {
 
 	private Path stageTempUploadDir(String inputUploadDirectory,
 	                                String binaryName,
-	                                String manifestName) throws IOException {
+	                                String manifestName, String... others) throws IOException {
 		Resource rootGcpAssetsDirectory
 				= new ClassPathResource(inputUploadDirectory);
 		Assert.isTrue(rootGcpAssetsDirectory.exists(), "the directory containing the GCP assets should exist");
@@ -139,6 +136,11 @@ class DeployerCommandLineRunner implements CommandLineRunner {
 
 		copyResourceToFile(binary, new File(tmpDir, binaryName).toPath());
 		copyResourceToFile(manifest, new File(tmpDir, "manifest.yml").toPath());
+
+		for (String o : others) {
+			copyResourceToFile(rootGcpAssetsDirectory.createRelative(o), new File(tmpDir, o).toPath());
+		}
+
 		return tmpDir.toPath();
 	}
 
@@ -163,7 +165,15 @@ class DeployerCommandLineRunner implements CommandLineRunner {
 
 
 	private void convertApplicationIntoServiceBroker(String stackdriverProxyApplication) {
-
+		/*
+		this.cloudFoundryOperations.serviceAdmin().create(CreateServiceBrokerRequest.builder()
+				.spaceScoped(true)
+				.url(stackdriverProxyApplication)
+				.name()
+				.username()
+				.password()
+				.build()).block();
+				*/
 	}
 
 	public void pushApplicationUsingManifest(Path binaryFile,

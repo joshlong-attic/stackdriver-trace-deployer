@@ -16,6 +16,7 @@
 applications:
   - name: gcp-service-broker
     product_version: "3.1.2"
+#    command: ./gcp-service-broker
     path : .
     buildpack:  https://github.com/cloudfoundry/binary-buildpack.git
     metadata_version: "1.0"
