@@ -19,21 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
-#!/bin/bash
-
-cf d -f stackdriver-zipkin-proxy
-
-cf d -f gcp-service-broker
-cf ds -f gcp-service-broker-db
-
-cf ds -f proxy-stackdriver-trace
-
-cf purge-service-instance -f proxy-stackdriver-trace
-cf purge-service-offering -f  gcp-service-broker
-cf delete-service-broker -f gcp-service-broker
-
- */
 @Component
 class DeployRunner implements CommandLineRunner {
 
@@ -66,7 +51,7 @@ class DeployRunner implements CommandLineRunner {
 		log.info("stackdriverProxyApplication = " + stackdriverProxyApplication);
 	}
 
-	// TODO (josh) detect if the service broker is already deployed
+	// TODO detect if the service broker is already deployed
 	private boolean gcpServiceBrokerNotProvisioned() {
 		return true;
 	}
