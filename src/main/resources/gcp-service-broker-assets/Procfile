@@ -1,1 +1,1 @@
-web: ./gcp-service-broker
+web: chmod a+x ./gcp-service-broker && ./gcp-service-broker
