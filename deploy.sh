@@ -3,7 +3,9 @@
 echo CF_GCP_ROOT is $CF_GCP_ROOT
 echo "Synchronizing GCP Service Broker Asssets"
 cp $CF_GCP_ROOT/gcp/src/gcp-service-broker/manifest-linux-binary.yml $CF_GCP_ROOT/stackdriver-trace-deployer/src/main/resources/gcp-service-broker-assets/manifest.yml
-cp $CF_GCP_ROOT/gcp/bin/gcp-service-broker $CF_GCP_ROOT/stackdriver-trace-deployer/src/main/resources/gcp-service-broker-assets/gcp-service-broker
+target_gcp_binary=$CF_GCP_ROOT/stackdriver-trace-deployer/src/main/resources/gcp-service-broker-assets/gcp-service-broker
+rm -rf $target_gcp_binary
+cp $CF_GCP_ROOT/gcp/bin/gcp-service-broker $target_gcp_binary
 
 
 echo "Synchronizing Stackdriver Zipkin Proxy Assets"
