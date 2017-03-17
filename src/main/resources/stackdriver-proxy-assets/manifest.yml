@@ -13,9 +13,9 @@
 # limitations under the License.
 ---
 applications:
-- name: stackdriver-zipkin-proxy
+- name: cloudfoundry-stackdriver-trace-zipkin-proxy
   memory: 512M
   buildpack: java_buildpack
-  path: ./proxy.jar
+  path: ./target/cloudfoundry-stackdriver-trace-zipkin-proxy-0.0.1-SNAPSHOT.jar
   services:
     - proxy-stackdriver-trace
