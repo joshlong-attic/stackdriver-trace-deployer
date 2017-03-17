@@ -48,7 +48,7 @@ class DeployRunner implements CommandLineRunner {
 		}
 
 		String stackdriverProxyApplication = deployStackdriverProxyApplication();
-		log.info("stackdriverProxyApplication = " + stackdriverProxyApplication);
+		log.info("stackdriver proxy application URL = " + stackdriverProxyApplication);
 	}
 
 	// TODO detect if the service broker is already deployed
