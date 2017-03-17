@@ -16,6 +16,6 @@ applications:
 - name: stackdriver-zipkin-proxy
   memory: 512M
   buildpack: java_buildpack
-  path: proxy.jar
+  path: ./proxy.jar
   services:
     - proxy-stackdriver-trace

@@ -65,7 +65,8 @@ class DeployRunner implements CommandLineRunner {
 		this.deployService.provisionServiceInstance("google-stackdriver-trace", "default", "proxy-stackdriver-trace");
 		ApplicationManifest manifest = this.manifestService
 				.applicationManifestFrom(new File(uploadPath.toFile(), "manifest.yml").toPath());
-		this.deployService.pushApplicationUsingManifest(uploadPath, manifest, true);
+		this.deployService.pushApplicationUsingManifest(new File(uploadPath.toFile(), "proxy.jar").toPath(),
+				manifest, true);
 		ApplicationDetail applicationDetail = this.cloudFoundryOperations.applications()
 				.get(GetApplicationRequest.builder().name(manifest.getName()).build())
 				.block();
